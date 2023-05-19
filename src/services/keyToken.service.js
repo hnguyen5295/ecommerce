@@ -3,7 +3,12 @@
 const keyTokenModel = require('../models/keytoken.model');
 
 class KeyTokenService {
-  static createKeyToken = async ({ userId, publicKey, privateKey, refreshToken }) => {
+  static createKeyToken = async ({
+    userId,
+    publicKey,
+    privateKey,
+    refreshToken,
+  }) => {
     try {
       const filter = {
           user: userId,
@@ -28,6 +33,14 @@ class KeyTokenService {
     } catch (error) {
       return error;
     }
+  };
+
+  static findByUserId = async (userId) => {
+    return await keyTokenModel.findOne({ user: userId }).lean();
+  };
+
+  static removeKeyById = async (id) => {
+    return await keyTokenModel.deleteOne(id);
   };
 }
 
