@@ -46,6 +46,23 @@ const authentication = asyncHandler(async (req, res, next) => {
   const keyStore = await findByUserId(userId);
   if (!keyStore) throw new NotFoundError('Not found keyStore');
 
+  if (req.headers[HEADER.REFRESH_TOKEN]) {
+    try {
+      const refreshToken = req.headers[HEADER.REFRESH_TOKEN];
+      const decodeUser = JWT.verify(refreshToken, keyStore.privateKey);
+      if (userId !== decodeUser.userId)
+        throw new AuthFailureError('Invalid UserId');
+
+      // used at logout controller
+      req.keyStore = keyStore;
+      req.user = decodeUser;
+      req.refreshToken = refreshToken;
+      return next();
+    } catch (error) {
+      throw error;
+    }
+  }
+
   const accessToken = req.headers[HEADER.AUTHORIZATION];
   if (!accessToken) throw new AuthFailureError('Invalid request');
 
@@ -62,7 +79,12 @@ const authentication = asyncHandler(async (req, res, next) => {
   }
 });
 
+const verifyJWT = async (token, secretKey) => {
+  return await JWT.verify(token, secretKey);
+};
+
 module.exports = {
   createTokenPair,
   authentication,
+  verifyJWT,
 };

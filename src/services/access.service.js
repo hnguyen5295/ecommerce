@@ -8,8 +8,8 @@ const { createTokenPair } = require('../auth/authUtils');
 const { getInfoData } = require('../utils/index');
 const {
   BadRequestError,
-  ConflictRequestError,
   AuthFailureError,
+  ForbiddenError,
 } = require('../core/error.response');
 
 const { findByEmail } = require('../services/shop.service');
@@ -21,6 +21,43 @@ const RoleShop = {
 };
 
 class AccessService {
+  static handleRefreshToken = async ({ refreshToken, user, keyStore }) => {
+    const { userId, email } = user;
+
+    if (keyStore.refreshTokensUsed.includes(refreshToken)) {
+      await KeyTokenService.deleteKeyById(userId);
+      throw new ForbiddenError('Something wrong! please login again!');
+    }
+
+    if (keyStore.refreshToken !== refreshToken)
+      throw new AuthFailureError('Shop is not registered!');
+
+    const foundShop = await findByEmail({ email });
+    if (!foundShop) throw new AuthFailureError('Shop is not registered!');
+
+    // create new token pair
+    const tokens = await createTokenPair(
+      { userId, email },
+      keyStore.publicKey,
+      keyStore.privateKey
+    );
+
+    // update token
+    await keyStore.updateOne({
+      $set: {
+        refreshToken: tokens.refreshToken,
+      },
+      $addToSet: {
+        refreshTokensUsed: refreshToken,
+      },
+    });
+
+    return {
+      user,
+      tokens,
+    };
+  };
+
   static logout = async (keyStore) => {
     return await KeyTokenService.removeKeyById(keyStore._id);
   };
