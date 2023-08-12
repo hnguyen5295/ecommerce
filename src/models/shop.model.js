@@ -1,7 +1,7 @@
 'use strict';
 const { model, Schema } = require('mongoose');
 
-export const SHOP_DOCUMENT = 'Shop';
+const SHOP_DOCUMENT = 'Shop';
 const SHOP_COLLECTION = 'Shops';
 // !dmbg: snippet
 // Declare the Schema of the Mongo model
@@ -42,4 +42,7 @@ var shopSchema = new Schema(
 );
 
 //Export the model
-module.exports = model(SHOP_DOCUMENT, shopSchema);
+module.exports = {
+  shopModel: model(SHOP_DOCUMENT, shopSchema),
+  SHOP_DOCUMENT,
+};
