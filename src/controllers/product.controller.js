@@ -5,15 +5,68 @@ const { SuccessResponse } = require('../core/success.response');
 
 class ProductController {
   createProduct = async (req, res, next) => {
-    console.log('ProductController', req);
     new SuccessResponse({
-      message: 'A new Product is created successfully!',
+      message: 'createProduct success!',
       metadata: await ProductService.createProduct(req.body.product_type, {
         ...req.body,
         product_shop: req.userId,
       }),
     }).send(res);
   };
+
+  publishProductByShop = async (req, res, next) => {
+    new SuccessResponse({
+      message: 'publishProductByShop success!',
+      metadata: await ProductService.publishProductByShop({
+        product_shop: req.userId,
+        product_id: req.params.id,
+      }),
+    }).send(res);
+  };
+
+  unPublishProductByShop = async (req, res, next) => {
+    new SuccessResponse({
+      message: 'unpublish success!',
+      metadata: await ProductService.unPublishProductByShop({
+        product_shop: req.userId,
+        product_id: req.params.id,
+      }),
+    }).send(res);
+  };
+
+  // QUERY //
+  /**
+   * @desc Get all drafts for shop
+   * @param { Number } limit
+   * @param { Number } skip
+   * @return { JSON }
+   */
+  getAllDrafsForShop = async (req, res, next) => {
+    new SuccessResponse({
+      message: 'getAllDrafsForShop success!',
+      metadata: await ProductService.findAllDraftsForShop({
+        product_shop: req.userId,
+      }),
+    }).send(res);
+  };
+
+  getAllPublishForShop = async (req, res, next) => {
+    new SuccessResponse({
+      message: 'getAllPublishForShop success!',
+      metadata: await ProductService.findAllPublishForShop({
+        product_shop: req.userId,
+      }),
+    }).send(res);
+  };
+
+  searchProducts = async (req, res, next) => {
+    new SuccessResponse({
+      message: 'searchProducts success!',
+      metadata: await ProductService.searchProducts(req.params),
+    }).send(res);
+  };
+
+  // END QUERY //
 }
 
 module.exports = new ProductController();
