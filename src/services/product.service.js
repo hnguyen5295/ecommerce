@@ -6,6 +6,8 @@ const {
   findAllPublishForShop,
   publishProductByShop,
   searchProductByUser,
+  findAllProducts,
+  findProduct,
 } = require('../models/repositories/product.repo');
 class ProductFactory {
   static productRegistry = {}; // key-class
@@ -19,6 +21,13 @@ class ProductFactory {
    * @param {string} payload
    */
   static createProduct(type, payload) {
+    const productClass = ProductFactory.productRegistry[type];
+    if (!productClass) throw new BadRequestError(`Invalid product type: ${type}`);
+
+    return new productClass(payload).createProduct();
+  }
+
+  static updateProduct(type, payload) {
     const productClass = ProductFactory.productRegistry[type];
     if (!productClass) throw new BadRequestError(`Invalid product type: ${type}`);
 
@@ -47,6 +56,21 @@ class ProductFactory {
   static async searchProducts({ searchKey }) {
     return await searchProductByUser({ searchKey });
   }
+
+  static async findAllProducts({ limit = 50, sort = 'ctime', page = 1, filter = { isPublished: true } }) {
+    return await findAllProducts({
+      limit,
+      sort,
+      page,
+      filter,
+      select: ['product_name', 'product_price', 'product_thumb'],
+    });
+  }
+
+  static async findProduct({ product_id }) {
+    return findProduct({ product_id, unSelect: ['__v'] });
+  }
+
   // END QUERY //
 }
 
@@ -55,14 +79,14 @@ class Product {
     product_name,
     product_shop,
     product_type,
-    product_thump,
+    product_thumb,
     product_price,
     product_quantity,
     product_attributes,
     product_description,
   }) {
     this.product_name = product_name;
-    this.product_thump = product_thump;
+    this.product_thumb = product_thumb;
     this.product_description = product_description;
     this.product_price = product_price;
     this.product_quantity = product_quantity;

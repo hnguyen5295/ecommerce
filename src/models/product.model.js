@@ -18,7 +18,7 @@ const FURNITURE_COLLECTION = 'Furnitures';
 const productSchema = new Schema(
   {
     product_name: { type: String, required: true },
-    product_thump: { type: String, required: true },
+    product_thumb: { type: String, required: true },
     product_description: String,
     product_slug: String,
     product_price: { type: Number, required: true },
