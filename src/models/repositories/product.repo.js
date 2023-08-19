@@ -13,7 +13,6 @@ const findAllPublishForShop = async ({ query, limit, skip }) => {
 };
 
 const searchProductByUser = async ({ searchKey }) => {
-  // https://anonystick.com/blog-developer/full-text-search-mongodb-chi-mot-bai-viet-khong-can-nhieu-2022012063033379
   const searchKeyRegex = new RegExp(searchKey);
   const result = await product
     .find(
@@ -35,6 +34,12 @@ const publishProductByShop = async ({ product_shop, product_id }) => {
 
 const unPublishProductByShop = async ({ product_shop, product_id }) => {
   return await updateProduct({ product_shop, product_id, isDraft: true, isPublished: false });
+};
+
+const updateProductById = async ({ productId, payload, model, isNew = true }) => {
+  return await model.findByIdAndUpdate(productId, payload, {
+    new: isNew,
+  });
 };
 
 const updateProduct = async ({ product_shop, product_id, isDraft, isPublished }) => {
@@ -78,4 +83,5 @@ module.exports = {
   unPublishProductByShop,
   findAllProducts,
   findProduct,
+  updateProductById,
 };
