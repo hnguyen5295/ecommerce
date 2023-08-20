@@ -9,7 +9,7 @@ class ProductController {
       message: 'createProduct success!',
       metadata: await ProductService.createProduct(req.body.product_type, {
         ...req.body,
-        product_shop: req.userId,
+        product_shop: req.user.userId,
       }),
     }).send(res);
   };
@@ -19,7 +19,7 @@ class ProductController {
       message: 'updateProduct success!',
       metadata: await ProductService.updateProduct(req.body.product_type, req.params.productId, {
         ...req.body,
-        product_shop: req.userId,
+        product_shop: req.user.userId,
       }),
     }).send(res);
   };
@@ -28,7 +28,7 @@ class ProductController {
     new SuccessResponse({
       message: 'publishProductByShop success!',
       metadata: await ProductService.publishProductByShop({
-        product_shop: req.userId,
+        product_shop: req.user.userId,
         product_id: req.params.id,
       }),
     }).send(res);
@@ -38,7 +38,7 @@ class ProductController {
     new SuccessResponse({
       message: 'unpublish success!',
       metadata: await ProductService.unPublishProductByShop({
-        product_shop: req.userId,
+        product_shop: req.user.userId,
         product_id: req.params.id,
       }),
     }).send(res);
@@ -55,7 +55,7 @@ class ProductController {
     new SuccessResponse({
       message: 'getAllDrafsForShop success!',
       metadata: await ProductService.findAllDraftsForShop({
-        product_shop: req.userId,
+        product_shop: req.user.userId,
       }),
     }).send(res);
   };
@@ -64,7 +64,7 @@ class ProductController {
     new SuccessResponse({
       message: 'getAllPublishForShop success!',
       metadata: await ProductService.findAllPublishForShop({
-        product_shop: req.userId,
+        product_shop: req.user.userId,
       }),
     }).send(res);
   };

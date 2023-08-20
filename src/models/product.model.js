@@ -3,8 +3,8 @@ const { model, Schema } = require('mongoose');
 const { SHOP_DOCUMENT } = require('./shop.model');
 const slugify = require('slugify');
 
-const DOCUMENT_NAME = 'Product';
-const COLLECTION_NAME = 'Products';
+const PRODUCT_DOCUMENT = 'Product';
+const PRODUCT_COLLECTION = 'Products';
 
 const ELECTRONIC_DOCUMENT = 'Electronic';
 const ELECTRONIC_COLLECTION = 'Electronics';
@@ -39,7 +39,7 @@ const productSchema = new Schema(
   },
   {
     timestamps: true,
-    collection: COLLECTION_NAME,
+    collection: PRODUCT_COLLECTION,
   }
 );
 // create index for search
@@ -95,7 +95,8 @@ const furnitureSchema = new Schema(
 
 //Export the model
 module.exports = {
-  product: model(DOCUMENT_NAME, productSchema),
+  PRODUCT_DOCUMENT,
+  product: model(PRODUCT_DOCUMENT, productSchema),
   electronic: model(ELECTRONIC_DOCUMENT, electronicSchema),
   clothing: model(CLOTHING_DOCUMENT, clothingSchema),
   furniture: model(FURNITURE_DOCUMENT, furnitureSchema),
