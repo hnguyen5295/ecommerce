@@ -10,6 +10,7 @@ const discountSchema = new Schema(
     discount_description: { type: String, required: true },
     discount_type: { type: String, default: 'fixed_amount' }, // percentage
     discount_value: { type: Number, required: true }, // 10.000, 10
+    discount_max_value: { type: Number, required: true },
     discount_code: { type: String, required: true },
     discount_start_date: { type: Date, required: true },
     discount_end_date: { type: Date, required: true },
