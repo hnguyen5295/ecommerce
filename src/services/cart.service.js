@@ -30,9 +30,9 @@ class CartService {
 
     // check cart exist or not
     const userCart = await cart.findOne({ cart_userId: userId });
+    const { product_name, product_price } = foundProduct;
     console.log('userCart', userCart);
     if (!userCart) {
-      const { product_name, product_price } = foundProduct;
       return await createUserCart({
         userId,
         product: {
@@ -45,12 +45,34 @@ class CartService {
 
     // Cart exist, product is empty
     if (!userCart.cart_products.length) {
-      userCart.cart_products.push(product);
+      userCart.cart_products.push({
+        ...product,
+        name: product_name,
+        price: product_price,
+      });
+      return await userCart.save();
+    }
+
+    // Cart exists, product not exists
+    const existedProduct = userCart.cart_products.find((cart_product) => cart_product.productId === productId);
+    if (!existedProduct) {
+      userCart.cart_products.push({
+        ...product,
+        name: product_name,
+        price: product_price,
+      });
       return await userCart.save();
     }
 
     // Cart exist, product exist
-    return await updateUserCartQuantity({ userId, product });
+    return await updateUserCartQuantity({
+      userId,
+      product: {
+        ...product,
+        name: product_name,
+        price: product_price,
+      },
+    });
   }
 
   /*

@@ -1,3 +1,1 @@
 # ecommerce
-
-// section 23
