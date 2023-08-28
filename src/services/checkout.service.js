@@ -3,7 +3,9 @@
 const { BadRequestError, NotFoundError } = require('../core/error.response');
 const { findCartById } = require('../models/repositories/cart.repo');
 const { checkProductByServer } = require('../models/repositories/product.repo');
+const { order } = require('../models/order.model');
 const { getDiscountAmount } = require('./discount.service');
+const { acquireLock, releaseLock } = require('./redis.service');
 
 class CheckoutService {
   /*
@@ -87,6 +89,39 @@ class CheckoutService {
       shop_order_ids_new,
       checkoutOrder,
     };
+  }
+
+  static async orderByUser({ shop_order_ids, cartId, userId, user_address = {}, user_payment = {} }) {
+    const { shop_order_ids_new, checkoutOrder } = await this.checkoutPreview({ cartId, userId, shop_order_ids });
+    const products = shop_order_ids_new.flatMap((order) => order.item_products);
+    console.log(`[1]::`, products);
+
+    const acquireProducts = [];
+    for (let i = 0; i < products.length; i++) {
+      const { productId, quantity } = products[i];
+      const keyLock = await acquireLock(productId, quantity, cartId);
+      acquireProducts.push(keyLock ? true : false);
+      if (keyLock) {
+        releaseLock(keyLock);
+      }
+    }
+
+    // If has a product is out of stock
+    if (acquireProducts.includes(false))
+      throw new BadRequestError(`Some products has been modified, please back to your Cart!`);
+
+    const newOrder = await order.create({
+      order_userId: userId,
+      order_checkout: checkoutOrder,
+      order_shipment: user_address,
+      order_payment: user_payment,
+      order_products: shop_order_ids_new,
+    });
+    // If order is success, then remove all product in the cart
+    if (newOrder) {
+    }
+
+    return newOrder;
   }
 }
 

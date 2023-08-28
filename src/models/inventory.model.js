@@ -5,7 +5,7 @@ const { SHOP_DOCUMENT } = require('./shop.model');
 const DOCUMENT_NAME = 'Inventory';
 const COLLECTION_NAME = 'Inventories';
 
-var inventorySchema = new Schema(
+const inventorySchema = new Schema(
   {
     inventory_productId: { type: Schema.Types.ObjectId, ref: PRODUCT_DOCUMENT },
     inventory_location: { type: String, default: 'unknown' },

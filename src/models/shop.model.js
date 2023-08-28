@@ -5,7 +5,7 @@ const SHOP_DOCUMENT = 'Shop';
 const SHOP_COLLECTION = 'Shops';
 // !dmbg: snippet
 // Declare the Schema of the Mongo model
-var shopSchema = new Schema(
+const shopSchema = new Schema(
   {
     name: {
       type: String,
