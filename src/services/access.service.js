@@ -1,16 +1,12 @@
 'use strict';
 
-const shopModel = require('../models/shop.model');
+const { shopModel } = require('../models/shop.model');
 const bcrypt = require('bcrypt');
 const crypto = require('node:crypto');
 const KeyTokenService = require('./keyToken.service');
 const { createTokenPair } = require('../auth/authUtils');
 const { getInfoData } = require('../utils/index');
-const {
-  BadRequestError,
-  AuthFailureError,
-  ForbiddenError,
-} = require('../core/error.response');
+const { BadRequestError, AuthFailureError, ForbiddenError } = require('../core/error.response');
 
 const { findByEmail } = require('../services/shop.service');
 const RoleShop = {
@@ -29,18 +25,13 @@ class AccessService {
       throw new ForbiddenError('Something wrong! please login again!');
     }
 
-    if (keyStore.refreshToken !== refreshToken)
-      throw new AuthFailureError('Shop is not registered!');
+    if (keyStore.refreshToken !== refreshToken) throw new AuthFailureError('Shop is not registered!');
 
     const foundShop = await findByEmail({ email });
     if (!foundShop) throw new AuthFailureError('Shop is not registered!');
 
     // create new token pair
-    const tokens = await createTokenPair(
-      { userId, email },
-      keyStore.publicKey,
-      keyStore.privateKey
-    );
+    const tokens = await createTokenPair({ userId, email }, keyStore.publicKey, keyStore.privateKey);
 
     // update token
     await keyStore.updateOne({
@@ -83,11 +74,7 @@ class AccessService {
 
     // generate tokens
     const { _id: userId } = foundShop;
-    const tokens = await createTokenPair(
-      { userId, email },
-      publicKey,
-      privateKey
-    );
+    const tokens = await createTokenPair({ userId, email }, publicKey, privateKey);
 
     await KeyTokenService.createKeyToken({
       refreshToken: tokens.refreshToken,
@@ -141,11 +128,7 @@ class AccessService {
       }
 
       // create token pair
-      const tokens = await createTokenPair(
-        { userId: newShop._id, email },
-        publicKey,
-        privateKey
-      );
+      const tokens = await createTokenPair({ userId: newShop._id, email }, publicKey, privateKey);
       console.log(`Token created::`, tokens);
 
       return {
