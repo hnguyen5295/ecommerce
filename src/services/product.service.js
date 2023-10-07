@@ -12,6 +12,8 @@ const {
 } = require('../models/repositories/product.repo');
 const { insertInventory } = require('../models/repositories/inventory.repo');
 const { removeUndefinedObject, updateNestedObjectParser } = require('../utils');
+const { pushNotifyToSystem } = require('./notification.service');
+const { findById } = require('./shop.service');
 class ProductFactory {
   static productRegistry = {}; // key-class
 
@@ -102,12 +104,24 @@ class Product {
     const newProduct = await product.create({ ...this, _id: product_id });
     if (newProduct) {
       // add newProduct into inventory_stock
-      console.log('this.product_shop: ', this.product_shop);
       await insertInventory({
         productId: newProduct._id,
         shopId: this.product_shop,
         stock: this.product_quantity,
       });
+
+      // push notify to system collection
+      pushNotifyToSystem({
+        type: 'SHOP-001',
+        receiverId: 1,
+        senderId: this.product_shop,
+        options: {
+          product_name: this.product_name,
+          shop_name: (await findById({ id: this.product_shop, select: { name: 1 } })).name,
+        },
+      })
+        .then((rs) => console.log(rs))
+        .catch(console.error);
     }
 
     return newProduct;
